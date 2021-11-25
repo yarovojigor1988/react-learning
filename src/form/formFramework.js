@@ -31,7 +31,5 @@ export function validateForm(formControls) {
     }
   }
 
-  console.log(isFormValid);
-
   return isFormValid
 }
