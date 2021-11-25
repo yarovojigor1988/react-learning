@@ -4,9 +4,9 @@ import { NavLink } from "react-router-dom";
 import Backdrop from "../../UI/Backdrop/Backdrop";
 
 const links = [
-  {to: '/', label:'List', exact: true},
-  {to: '/auth', label:'Autorization', exact: false},
-  {to: '/quiz-creator', label:'Create Test', exact: false},
+  {to: '/', label:'List', exact: 'true'},
+  {to: '/auth', label:'Autorization', exact: 'false'},
+  {to: '/quiz-creator', label:'Create Test', exact: 'false'},
 ]
 
 class Drawer extends Component {
@@ -18,7 +18,7 @@ class Drawer extends Component {
           <NavLink
             to={link.to}
             exact={link.exact}
-            activeClassName={classes.active}
+            // activeClassName={classes.active}
             onClick={this.clickHandler}
           >
             {link.label}
