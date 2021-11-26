@@ -72,8 +72,17 @@ class Quiz extends Component {
   }
 
   async componentDidMount() {
+
+    // for some time
+    const locationString = window.location.href
+    const locationHash = locationString.slice(locationString.indexOf('/quiz/') +6 )
+
+
     try {
-      const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+      // const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+      //  this.props.match - undefiend. Need router 5 or less... 
+      const response = await axios.get(`/quizes/${locationHash}.json`)
+
       const quiz = response.data
 
       this.setState({
