@@ -1,12 +1,13 @@
 import React, {Component} from "react"
 import classes from './Auth.module.css'
-import Button from "../../components/UI/Button/Button"
-import Input from "../../components/UI/Input/Input"
+import Button from '../../components/UI/Button/Button'
+import Input from '../../components/UI/Input/Input'
 import is from 'is_js'
-import axios from 'axios'
+import {connect} from 'react-redux'
+import {auth} from '../../store/actions/auth'
 
 
- export default class Auth extends Component {
+class Auth extends Component {
 
   state = {
     isFormValid: false,
@@ -38,62 +39,29 @@ import axios from 'axios'
     }
   }
 
-  renderInputs() {
-    return Object.keys(this.state.formControls).map((controlName, index)=>{
-      const control = this.state.formControls[controlName]
-      return(
-        <Input 
-          key={controlName + index}
-          type={control.type}
-          value={control.value}
-          valid={control.valid}
-          label={control.label}
-          touched={control.touched}
-          shouldValidate={!!control.validation}
-          errorMessage={control.errorMessage}
-          onChange={event => this.onChangeHandler(event, controlName)}
-        />
-      )
-    })
+  loginHandler = () => {
+    this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      true
+    )
   }
 
-  loginHandler = async () => {
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDYszNcTEZMH8eq-seBP7slaPUKx8J86aM', authData)
+  registerHandler = () => {
+    this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      false
+    )
 
-      console.log(response.data)
-    } catch (e) {
-      console.log(e)
-    }
   }
-
-  registerHandler = async () => {
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDYszNcTEZMH8eq-seBP7slaPUKx8J86aM', authData)
-
-      console.log(response.data)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
 
   submitHandler = event => {
     event.preventDefault()
   }
 
-  validateControl(value, validation){
-    if (!validation)  {
+  validateControl(value, validation) {
+    if (!validation) {
       return true
     }
 
@@ -109,13 +77,12 @@ import axios from 'axios'
 
     if (validation.minLength) {
       isValid = value.length >= validation.minLength && isValid
-
     }
 
     return isValid
   }
 
-  onChangeHandler(event, controlName) {
+  onChangeHandler = (event, controlName) => {
     const formControls = { ...this.state.formControls }
     const control = { ...formControls[controlName] }
 
@@ -131,38 +98,66 @@ import axios from 'axios'
       isFormValid = formControls[name].valid && isFormValid
     })
 
-    this.setState({formControls, isFormValid})
+    this.setState({
+      formControls, isFormValid
+    })
+  }
+
+  renderInputs() {
+    return Object.keys(this.state.formControls).map((controlName, index) => {
+      const control = this.state.formControls[controlName]
+      return (
+        <Input
+          key={controlName + index}
+          type={control.type}
+          value={control.value}
+          valid={control.valid}
+          touched={control.touched}
+          label={control.label}
+          shouldValidate={!!control.validation}
+          errorMessage={control.errorMessage}
+          onChange={event => this.onChangeHandler(event, controlName)}
+        />
+      )
+    })
   }
 
   render() {
     return (
       <div className={classes.Auth}>
         <div>
-          <h1>Authorization</h1>
+          <h1>Авторизация</h1>
 
-        <form className={classes.AuthForm} onSubmit={this.submitHandler}>
+          <form onSubmit={this.submitHandler} className={classes.AuthForm}>
 
-          { this.renderInputs() }
+            { this.renderInputs() }
 
-          <Button           
-            type="success" 
-            onClick={this.loginHandler}
-            disabled={!this.state.isFormValid}
-          >
-            Log in
-          </Button>
-          <Button           
-            type="primary" 
-            onClick={this.registerHandler}
-            disabled={!this.state.isFormValid}
-          >
-          register
-          </Button>
-        </form>
+            <Button
+              type="success"
+              onClick={this.loginHandler}
+              disabled={!this.state.isFormValid}
+            >
+              Войти
+            </Button>
 
-
+            <Button
+              type="primary"
+              onClick={this.registerHandler}
+              disabled={!this.state.isFormValid}
+            >
+              Зарегистрироваться
+            </Button>
+          </form>
         </div>
       </div>
     )
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    auth: (email, password, isLogin) => dispatch(auth(email, password, isLogin))
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Auth)
